@@ -6,13 +6,20 @@ import Vapor
 // configures your application
 public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+    // directorio publico. Creamos directorio en Raiz.
+    app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
+    // configuracion SQL Lite
     app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
+       // .file = Disco
+       // .memory = solo en memoria
+    
+    // migracion
+  //  app.migrations.add(CreateTodo())
 
-    app.migrations.add(CreateTodo())
-
+    // Uso de Leaf
     app.views.use(.leaf)
+    app.leaf.cache.isEnabled = app.environment.isRelease // activa la cache solo en produccion, y no en Desarrollo
 
     
 

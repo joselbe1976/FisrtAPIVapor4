@@ -2,13 +2,19 @@ import Fluent
 import Vapor
 
 func routes(_ app: Application) throws {
-    app.get { req in
-        return req.view.render("index", ["title": "Hello Vapor!"])
-    }
+  
+    // registro controladore con Routes
+    try app.register(collection: DemoController())
+    
+}
 
-    app.get("hello") { req -> String in
-        return "Hello, world!"
-    }
 
-    try app.register(collection: TodoController())
+struct JSONTest:Content{
+    let firstName : String
+    let lastName : String
+}
+
+struct ResponseTest:Content{
+    let saludo:String
+    let fullName: String
 }
