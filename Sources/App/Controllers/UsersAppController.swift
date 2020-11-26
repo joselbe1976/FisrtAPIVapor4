@@ -14,13 +14,14 @@ struct UsersAppController : RouteCollection {
         //Crear usuairos
         app.get("create", use: getCreateUser) // Create get
         app.post("create", use: postCreateUserCustomize) //create POst
-        
         // consulta basica
         app.get("allusers", use: getAllUsers) // todos
         app.get("getuser", use: getUser) //  1 usuario
         app.post("postUser", use: postUser) // valida usuario
-        //Cambio clave
-        app.post("getUpdateUserPass", use: getUpdateUserPass)
+        app.put("postUpdateUserPass", use: postUpdateUserPass)
+        app.delete("delete", use: deleteUser)
+        app.delete("deleteUser", ":id", use: deleteUserParam)
+        
     }
   
     
@@ -105,28 +106,21 @@ struct UsersAppController : RouteCollection {
                     } else {
                         return .badRequest
                     }
-                    
                 }
-      
-       
-            
     }
     
 
-    func getUpdateUserPass(_ req:Request) throws -> EventLoopFuture<HTTPStatus> {
-        guard let email = req.query[String.self, at: "email"],
-              let oldPass = req.query[String.self, at: "oldPass"],
-              let newPass = req.query[String.self, at: "newPass"] else {
-            throw Abort(.badRequest)
-        }
+    func postUpdateUserPass(_ req:Request) throws -> EventLoopFuture<HTTPStatus> {
+        let query = try req.content.decode(UsersQueryPass.self)
+        
         return UsersApp
             .query(on: req.db)
-            .filter(\.$email == email)
+            .filter(\.$email == query.email)
             .first()
             .unwrap(or: Abort(.notFound))
             .map { user   in
-                if let okPass = try? req.password.verify(oldPass, created: user.password), okPass ,
-                    let newPassHas = try? req.password.hash(newPass){
+                if let okPass = try? req.password.verify(query.password, created: user.password), okPass ,
+                   let newPassHas = try? req.password.hash(query.newPassword){
                     user.password = newPassHas
                     // grabamos la clave
                     let _ =  user.update(on: req.db)
@@ -137,4 +131,32 @@ struct UsersAppController : RouteCollection {
                 }
             }
     }
+    
+    
+    func deleteUser(_ req:Request) throws -> EventLoopFuture<HTTPStatus> {
+        let query = try req.content.decode(UsersQueryID.self)
+        //buscamos en BBDD por el ID en la tabla
+        return UsersApp.find(query.id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap{ user in
+               // $0.delete(on: req.db)
+                user.delete(on: req.db)
+            }
+            .transform(to: .ok)
+        
+    }
+   
+    
+    func deleteUserParam(_ req:Request) throws -> EventLoopFuture<HTTPStatus> {
+       
+        UsersApp.find(req.parameters.get("id"), on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap{ user in
+               // $0.delete(on: req.db)
+                user.delete(on: req.db)
+            }
+            .transform(to: .ok)
+        
+    }
+    
 }

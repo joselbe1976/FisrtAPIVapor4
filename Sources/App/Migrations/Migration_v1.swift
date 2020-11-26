@@ -19,14 +19,102 @@ struct CreateUsersApp_v1 : Migration {
             .unique(on: .email) // email dato único
             .create()
     }
-    
+
     
     // si se hecha a tras la migración
     func revert(on database: Database) -> EventLoopFuture<Void> {
         database.schema(UsersApp.schema)
             .delete()
-            
     }
-    
-    
+}
+
+
+struct CreateNationality_v1: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Nationality.schema)
+            .id()
+            .field("country", .string, .required)
+            .create()
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Nationality.schema)
+            .delete()
+    }
+}
+
+
+struct CreateCategories_v1: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Categories.schema)
+            .field("id", .int, .identifier(auto: true))
+            .field("name", .string, .required)
+            .unique(on: "id") // PK
+            .create()
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Categories.schema)
+            .delete()
+    }
+}
+
+
+struct CreateComposers_v1: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Composers.schema)
+            .id()
+            .field("name", .string, .required)
+            .field("birth_date", .int) //is optional NOt required
+            .field("nationality", .uuid, .sql(.default(UUID().uuidString))) // not required, default value to the field
+            .foreignKey("nationality", references: Nationality.schema, "id",
+                        onDelete: .setDefault, onUpdate: .cascade) // FK
+            .unique(on: "name") // clave dato unico. Restriccion.
+            .create()
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Composers.schema)
+            .delete()
+    }
+}
+
+
+
+struct CreateScores_v1: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Scores.schema)
+            .id()
+            .field("title", .string, .required)
+            .field("year", .int) //is optional NOt required
+            .field("number_tracks", .int) // not required
+            .field("composer", .uuid, .required)
+            .foreignKey("composer", references: Composers.schema, "id", onDelete: .cascade, onUpdate: .cascade, name: "FK_Composer") // FK con Tabla Composers
+            .field("category", .int) // not required
+            .foreignKey("category", references: Categories.schema, "id", onDelete: .setNull, onUpdate: .cascade, name: "FK_Categories")  // FK con Tabla Categories
+            .create()
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(Scores.schema)
+            .delete()
+    }
+}
+
+
+// Tablas Sublins no se crean FK, porque las bbdd no los soportan: La relacion lo hace a nivel logico,
+// pero fisicamente no se representa
+struct CreateUsersScores_v1: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(UsersScores.schema)
+            .id()
+            .field("score", .uuid, .required)
+            .field("user", .uuid, .required)
+            .create()
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(UsersScores.schema)
+            .delete()
+    }
 }

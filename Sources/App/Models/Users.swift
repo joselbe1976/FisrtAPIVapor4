@@ -22,6 +22,8 @@ final class UsersApp : Model, Content {
     @Field(key: .password) var password:String
     @Field(key: .activo) var activo:Bool
     
+    // Relacion N a N con Scores
+    @Siblings(through: UsersScores.self, from: \.$user, to: \.$score ) var scores:[Scores]
     
     // constructor Vacio. Obligatorio
     init(){}
@@ -42,4 +44,14 @@ struct UsersAppResponse: Content {
 struct UsersQuery : Content {
     let email : String
     let password : String
+}
+
+struct UsersQueryPass: Content {
+    let email : String
+    let password : String
+    let newPassword : String
+}
+
+struct UsersQueryID :Content{
+    let id:UUID
 }
