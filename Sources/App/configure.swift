@@ -21,7 +21,11 @@ public func configure(_ app: Application) throws {
     app.views.use(.leaf)
     app.leaf.cache.isEnabled = app.environment.isRelease // activa la cache solo en produccion, y no en Desarrollo
 
+    // migraciones de version 1
+    app.migrations.add(CreateUsersApp_v1())
     
+    //encriptacion del sistema
+    app.passwords.use(.bcrypt)
 
     // register routes
     try routes(app)
