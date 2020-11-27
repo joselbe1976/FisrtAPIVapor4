@@ -9,7 +9,7 @@ import Vapor
 import Fluent
 
 
-final class Scores : Model {
+final class Scores : Model, Content {
     static let schema = "scores"
     
     @ID() var id:UUID?
@@ -37,4 +37,13 @@ final class Scores : Model {
         self.$category.id = category
         
     }
+}
+
+
+struct ScoresRequestCreate : Content {
+    let title : String
+    let year : Int?
+    let numtracks : Int?  // optional
+    let composer : String // name of Composer
+    let category : String?  // name of category. Optional
 }
