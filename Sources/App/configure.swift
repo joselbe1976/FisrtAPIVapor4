@@ -21,8 +21,16 @@ public func configure(_ app: Application) throws {
     app.views.use(.leaf)
     app.leaf.cache.isEnabled = app.environment.isRelease // activa la cache solo en produccion, y no en Desarrollo
 
-    // migraciones de version 1
+    // migraciones de version 1. Ojo al Orden de ejecucion de los Script
     app.migrations.add(CreateUsersApp_v1())
+    app.migrations.add(CreateNationality_v1())
+    app.migrations.add(CreateCategories_v1())
+    app.migrations.add(CreateComposers_v1())
+    app.migrations.add(CreateScores_v1())
+    app.migrations.add(CreateUsersScores_v1())
+
+    // Data
+    app.migrations.add(CreateCategoriesData())
     
     //encriptacion del sistema
     app.passwords.use(.bcrypt)

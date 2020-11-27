@@ -36,3 +36,10 @@ final class Composers : Model, Content {
         self.$nationality.id = nationality
     }
 }
+
+
+struct ComposerCreate : Content {
+    let name : String
+    let birthDate:Int
+    let nationality : String?
+}

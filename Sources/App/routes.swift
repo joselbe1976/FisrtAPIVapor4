@@ -6,6 +6,8 @@ func routes(_ app: Application) throws {
     // registro controladore con Routes
     try app.register(collection: DemoController())
     try app.register(collection: UsersAppController())
+    try app.register(collection: ComposerController())
+    
 }
 
 

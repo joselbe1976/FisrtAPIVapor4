@@ -118,3 +118,27 @@ struct CreateUsersScores_v1: Migration {
             .delete()
     }
 }
+
+
+
+struct CreateCategoriesData: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+      let cat1 = Categories(name: "Accion")
+      let cat2 = Categories(name: "Romantica")
+      let cat3 = Categories(name: "Epic")
+      let cat4 = Categories(name: "Drama")
+      
+        // ejecutar un array de EventLoopFuture<void> (un bucle de ejecucion)
+      return .andAllSucceed([
+            cat1.create(on: database),
+            cat2.create(on: database),
+            cat3.create(on: database),
+            cat4.create(on: database)
+        ], on: database.eventLoop)
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        Categories.query(on: database).delete()  // eliminamos la recuperacion de todos los datos (query)
+    }
+    
+}

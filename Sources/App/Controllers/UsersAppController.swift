@@ -148,15 +148,12 @@ struct UsersAppController : RouteCollection {
    
     
     func deleteUserParam(_ req:Request) throws -> EventLoopFuture<HTTPStatus> {
-       
         UsersApp.find(req.parameters.get("id"), on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap{ user in
-               // $0.delete(on: req.db)
                 user.delete(on: req.db)
             }
             .transform(to: .ok)
-        
     }
     
 }
