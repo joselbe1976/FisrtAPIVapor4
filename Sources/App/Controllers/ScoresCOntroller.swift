@@ -17,8 +17,44 @@ struct ScoresController : RouteCollection {
         app.get("find", use: getScore)
         app.get("all", use: getAllScore)
         app.delete("delete", use: deleteScore)
+        app.put("update", use: updateScore)
     }
     
+    
+    
+    func updateScore(_ req:Request) throws -> EventLoopFuture<HTTPStatus>{
+        let score = try req.content.decode(ScoresRequestUpdate.self)
+        
+        return Scores
+            .query(on: req.db)
+            .filter(\.$id == score.id)
+            .first()
+            .unwrap(or: Abort(.notFound))
+            .flatMap{ DBScore in
+                //Desempaqueto cada opcional. Puede venir 1 campo o todos en el PUT
+                if let title = score.title {
+                    DBScore.title = title
+                }
+                if let numtracks = score.numtracks {
+                    DBScore.numberTracks = numtracks
+                }
+                if let year = score.year {
+                    DBScore.year = year
+                }
+                if let idcategory = score.idcategory {
+                    DBScore.$category.id = idcategory
+                }
+                if let idcomposer = score.idcomposer {
+                    DBScore.$composer.id = idcomposer
+                }
+                
+                return DBScore
+                    .update(on: req.db)
+                    .transform(to: .ok)
+            }
+        
+        
+    }
 
     func getAllScore(_ req:Request) throws -> EventLoopFuture<[Scores]>{
       

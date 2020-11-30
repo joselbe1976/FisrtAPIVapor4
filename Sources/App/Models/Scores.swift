@@ -47,3 +47,12 @@ struct ScoresRequestCreate : Content {
     let composer : String // name of Composer
     let category : String?  // name of category. Optional
 }
+
+struct ScoresRequestUpdate : Content {
+    let id:UUID
+    let title : String?
+    let year : Int?
+    let numtracks : Int?
+    let idcomposer : UUID?
+    let idcategory : Int?
+}
