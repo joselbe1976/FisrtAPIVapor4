@@ -44,7 +44,7 @@ struct ScoresRequestCreate : Content {
     let title : String
     let year : Int?
     let numtracks : Int?  // optional
-    let composer : String // name of Composer
+    let composer : UUID // name of Composer
     let category : String?  // name of category. Optional
 }
 
@@ -55,4 +55,8 @@ struct ScoresRequestUpdate : Content {
     let numtracks : Int?
     let idcomposer : UUID?
     let idcategory : Int?
+}
+
+struct Scorequery : Content {
+    let title : String
 }

@@ -16,6 +16,7 @@ struct ComposerController : RouteCollection {
         app.post("create", use:newComposer)
         app.get("find", use:getComposer)
         
+        app.get("all", use:getAllComposer)
     }
     
     // New Composer
@@ -75,6 +76,13 @@ struct ComposerController : RouteCollection {
             .unwrap(or: Abort(.notFound))
     }
     
+    
+    func getAllComposer(_ req:Request) throws -> EventLoopFuture<[Composers]>{
+        return Composers
+            .query(on: req.db)
+            .with(\.$nationality) // que pille la nacionalidad y saque el nombre por la relacion FK
+            .all()
+    }
 
 
 }

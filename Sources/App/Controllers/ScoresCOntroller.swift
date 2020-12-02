@@ -92,9 +92,7 @@ struct ScoresController : RouteCollection {
         }
         
         return Scores
-            .query(on: req.db)
-            .filter(\.$title == param)
-            .first()
+            .find(UUID(param) , on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap{ score in
                 score.delete(on: req.db)
@@ -107,9 +105,7 @@ struct ScoresController : RouteCollection {
         let scoreCreate = try req.content.decode(ScoresRequestCreate.self)
         
         return Composers
-            .query(on: req.db)
-            .filter(\.$name == scoreCreate.composer)
-            .first()
+            .find(scoreCreate.composer, on: req.db)
             .flatMap{ composer in
                 if let compositor = composer?.id {
                     // Si existe el compositor
@@ -117,26 +113,19 @@ struct ScoresController : RouteCollection {
                    
                 }
                 else {
-                    // no existe el compositor. Debemos crearlo.
-                    let newComposer = Composers(name: scoreCreate.composer, birthDate: 1800, nationality: nil)
-                    return newComposer
-                        .create(on: req.db)
-                        .flatMap{
-                            return newScoreAux(req: req, composerId: newComposer.id!, scoreCreate: scoreCreate)
-                        }
+                    // no existe el compositor. ERROR
+                    return  req.eventLoop.makeSucceededFuture(HTTPStatus.notFound)
                 }
             }
     }
 
     // funcion auxiliar
     func newScoreAux(req:Request, composerId:UUID, scoreCreate:ScoresRequestCreate)  -> EventLoopFuture<HTTPStatus>{
-        if let nmcategoria = scoreCreate.category {
+        if let idcategoria : Int = Int(scoreCreate.category!) {
             // Si viene la categoria. La buscamos y guardamos
             
             return Categories
-                .query(on: req.db)
-                .filter(\.$name == nmcategoria)
-                .first()
+                .find(idcategoria, on: req.db)
                 .flatMap{ cat in
                     
                     if let idCategoria = cat?.id{

@@ -9,7 +9,7 @@ import Vapor
 import Fluent
 
 
-final class Categories : Model {
+final class Categories : Model , Content{
     static let schema = "categories"
     
     @ID(custom: "id") var id:Int?

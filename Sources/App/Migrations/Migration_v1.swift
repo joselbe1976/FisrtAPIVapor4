@@ -108,8 +108,8 @@ struct CreateUsersScores_v1: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         database.schema(UsersScores.schema)
             .id()
-            .field("score", .uuid, .required)
-            .field("user", .uuid, .required)
+            .field("score", .uuid, .required, .references(Scores.schema, "id")) // Hay una referencia al modelo logico
+            .field("user", .uuid, .required, .references(UsersApp.schema, "id")) // referencia auuda a la relaciones logicas. Ayuda a la bbdd logica entienda mejor la relacion
             .create()
     }
 
