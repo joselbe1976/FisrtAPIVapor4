@@ -49,7 +49,12 @@ struct UsersAppController : RouteCollection {
         let userApp = try req.content.decode(UsersApp.self) // Decode el JSON al modelo
         userApp.password = try req.password.hash(userApp.password) // encripto la password
         
-        return userApp.save(on: req.db).map{ userApp }
+        return userApp.save(on: req.db)
+            .map{ userApp }
+            /*.flatMapThrowing{
+                userApp.asPublic()
+            }
+ */
     }
     
     //Crea usuario y devuelve el usuario con un customizado
