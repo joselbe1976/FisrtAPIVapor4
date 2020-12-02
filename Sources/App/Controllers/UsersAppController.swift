@@ -45,7 +45,8 @@ struct UsersAppController : RouteCollection {
     
     //Crea usuario y devuelve el usuario
     func postCreateUser(_ req:Request) throws -> EventLoopFuture<UsersApp>{
-        let userApp = try req.content.decode(UsersApp.self)
+        try UsersApp.validate(content: req) // valida que los daros de entrada sean correcto el JSON.
+        let userApp = try req.content.decode(UsersApp.self) // Decode el JSON al modelo
         userApp.password = try req.password.hash(userApp.password) // encripto la password
         
         return userApp.save(on: req.db).map{ userApp }

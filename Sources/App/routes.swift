@@ -10,6 +10,7 @@ func routes(_ app: Application) throws {
     try app.register(collection: ScoresController())
     try app.register(collection: ScoresUsersController())
     try app.register(collection: MaestrosComtroller())
+    try app.register(collection: LoginController())
     
 }
 
