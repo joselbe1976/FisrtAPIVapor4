@@ -141,4 +141,31 @@ struct CreateCategoriesData: Migration {
         Categories.query(on: database).delete()  // eliminamos la recuperacion de todos los datos (query)
     }
     
+    
+
+    
+}
+
+
+
+struct CreateUserToken_V1: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(UserToken.schema)
+            .id()
+            .field("user_id", .uuid, .references(UsersApp.schema, "id"))
+            .field("tokenValue", .string, .required)
+            .unique(on: "tokenValue")
+            .field("create", .datetime, .required)
+            .field("expiration", .datetime)
+            .create()
+    }
+
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(UserToken.schema)
+            .delete()
+    }
+    
+    
+
+    
 }

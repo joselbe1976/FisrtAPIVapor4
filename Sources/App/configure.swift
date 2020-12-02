@@ -28,6 +28,7 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateComposers_v1())
     app.migrations.add(CreateScores_v1())
     app.migrations.add(CreateUsersScores_v1())
+    app.migrations.add(CreateUserToken_V1())
 
     // Data
     app.migrations.add(CreateCategoriesData())
